@@ -1,0 +1,24 @@
+{
+  "name": "lw.svg-parser",
+  "version": "1.0.0",
+  "description": "SVG parser for LaserWeb",
+  "main": "./src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lautr3k/lw.svg-parser.git"
+  },
+  "keywords": [
+    "svg",
+    "parser",
+    "laserweb"
+  ],
+  "author": "Sébastien Mischler (skarab, Lautr3k)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lautr3k/lw.svg-parser/issues"
+  },
+  "homepage": "https://github.com/lautr3k/lw.svg-parser#readme"
+}
