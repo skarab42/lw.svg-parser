@@ -4,7 +4,7 @@ const MATH_PI_2  = Math.PI * 2
 const DEG_TO_RAD = Math.PI / 180
 
 // Rewrite from https://github.com/MadLittleMods/svg-curve-lib/blob/master/src/js/svg-curve-lib.js#L84
-export class Arc {
+class Arc {
     // Class constructor...
     constructor(settings) {
         this.init(settings)
@@ -155,3 +155,6 @@ export class Arc {
         return this.points
     }
 }
+
+// Exports
+export { Arc }

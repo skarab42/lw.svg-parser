@@ -2,7 +2,7 @@ import { Arc } from './trace'
 import { Point } from './path'
 
 // SVG tag parser
-export class TagParser {
+class TagParser {
     // Class constructor...
     constructor(tag, parser) {
         // Init properties
@@ -980,3 +980,7 @@ export class TagParser {
         return this._addPoints(coords, false)
     }
 }
+
+// Exports
+export { TagParser }
+export default TagParser
