@@ -20,7 +20,8 @@ export class Parser {
         this.supportedTags = [
             'svg', 'g', 'defs', 'use',
             'line', 'polyline', 'polygon',
-            'rect', 'circle', 'ellipse', 'path'
+            'rect', 'circle', 'ellipse', 'path',
+            'title', 'desc'
         ]
 
         // Tags list to includes/excludes

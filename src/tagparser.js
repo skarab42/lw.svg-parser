@@ -463,6 +463,26 @@ export class TagParser {
         return true
     }
 
+    _title() {
+        // Register the first encountered title tag as document title
+        if (this.parser.document && ! this.parser.document.title) {
+            this.parser.document.title = this.tag.element.textContent
+        }
+
+        // Handled tag
+        return true
+    }
+
+    _desc() {
+        // Register the first encountered desc tag as document description
+        if (this.parser.document && ! this.parser.document.description) {
+            this.parser.document.description = this.tag.element.textContent
+        }
+
+        // Handled tag
+        return true
+    }
+
     _defs() {
         // Register all child element with an id attribute
         this.tag.element.childNodes.forEach(childNode => {
