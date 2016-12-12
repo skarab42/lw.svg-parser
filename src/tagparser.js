@@ -469,8 +469,8 @@ export class TagParser {
             this.parser.document.title = this.tag.element.textContent
         }
 
-        // Handled tag
-        return true
+        // Skipped tag
+        return false
     }
 
     _desc() {
@@ -479,8 +479,8 @@ export class TagParser {
             this.parser.document.description = this.tag.element.textContent
         }
 
-        // Handled tag
-        return true
+        // Skipped tag
+        return false
     }
 
     _defs() {
