@@ -1,5 +1,6 @@
 // Imports
-import './tag'
+import { Tag } from './tag'
+import { TagParser } from './tagparser'
 
 // SVG parser class
 export class Parser {
@@ -14,7 +15,6 @@ export class Parser {
         this.document = null // Document info { width, height, viewBox }
         this.defs     = null // Defined <defs> (DOM) nodes list by id
         this.tags     = null // Tag objects hierarchy
-        this.tag      = null // Current Tag object
 
         // Supported tags by this lib
         this.supportedTags = [
@@ -25,6 +25,9 @@ export class Parser {
 
         // Tags list to parse
         this.parseTags = settings.includes || this.supportedTags
+
+        // User onTag callback ?
+        settings.onTag && this.onTag(settings.onTag, settings.onTagContext)
     }
 
     // Load raw XML string, XMLDocument, Element or File object
@@ -58,16 +61,16 @@ export class Parser {
         return new Promise((resolve, reject) => {
             // Bad input type
             if (! (input instanceof Element)) {
-                return reject(new Error('Input param must be a Element object.'))
+                reject(new Error('Input param must be a Element object.'))
             }
 
             // Parser error
             if (input.nodeName === 'parsererror') { // FF
-                return reject(new Error(input.textContent))
+                reject(new Error(input.textContent))
             }
 
             if (input.nodeName === 'html' && input.getElementsByTagName('parsererror')) { // Chrome
-                return reject(new Error(input.getElementsByTagName('parsererror')[0].textContent))
+                reject(new Error(input.getElementsByTagName('parsererror')[0].textContent))
             }
 
             // Set document element
@@ -83,7 +86,7 @@ export class Parser {
         return new Promise((resolve, reject) => {
             // Bad input type
             if (! (input instanceof XMLDocument)) {
-                return reject(new Error('Input param must be a XMLDocument object.'))
+                reject(new Error('Input param must be a XMLDocument object.'))
             }
 
             // Load from Element...
@@ -96,8 +99,11 @@ export class Parser {
         return new Promise((resolve, reject) => {
             // Bad input type
             if (typeof input !== 'string') {
-                return reject(new Error('Input param must be a string.'))
+                reject(new Error('Input param must be a string.'))
             }
+
+            // Parse svg editor
+            this._parseEditor(input)
 
             // Parse string as DOM object
             let parser = new DOMParser()
@@ -108,16 +114,53 @@ export class Parser {
         })
     }
 
+    // Try to get the svg editor from input string
+    _parseEditor(input) {
+        // Reset editor
+        this.editor = {
+            name       : 'unknown',
+            version    : null,
+            fingerprint: null
+        }
+
+        // Fingerprint matches
+        let fingerprint
+
+        // Inkscape
+        fingerprint = input.match(/<!-- Created with Inkscape .*-->/i)
+
+        if (fingerprint) {
+            this.editor.name        = 'inkscape'
+            this.editor.fingerprint = fingerprint[0]
+
+            return this.editor
+        }
+
+        // Illustrator
+        fingerprint = input.match(/<!-- Generator: Adobe Illustrator ([0-9\.]+), .*-->/i)
+
+        if (fingerprint) {
+            this.editor.name        = 'illustrator'
+            this.editor.version     = fingerprint[1]
+            this.editor.fingerprint = fingerprint[0]
+
+            return this.editor
+        }
+
+        // Return default
+        return this.editor
+    }
+
     // Load from File object
     loadFromFile(input) {
         return new Promise((resolve, reject) => {
             // Bad input type
             if (! (input instanceof File)) {
-                return reject(new Error('Input param must be a File object.'))
+                reject(new Error('Input param must be a File object.'))
             }
 
             // Create file reader
-            var reader = new FileReader()
+            let reader = new FileReader()
 
             // Register reader events handlers
             reader.onload = event => {
@@ -132,7 +175,104 @@ export class Parser {
             reader.readAsText(input)
         })
     }
-}
 
-// Exports default
-export default Parser
+    // Parse the (loaded) element
+    parse(input) {
+        // Reset properties
+        this.document = null
+        this.defs     = {}
+        this.tags     = null
+
+        // Load input if provided
+        if (input) {
+            return new Promise((resolve, reject) => {
+                this.load(input).then(() => {
+                    resolve(this.parse())
+                }).catch(reject)
+            })
+        }
+
+        // Start parsing element
+        return new Promise((resolve, reject) => {
+            // If no element is loaded
+            if (! this.element) {
+                reject(new Error('No element is loaded, call the load method before.'))
+            }
+
+            // Parse the main Element (recursive)
+            this.tags = this._parseElement(this.element)
+
+            if (! this.tags) {
+                reject(new Error('No supported tags found.'))
+            }
+
+            // Apply matrix (recursive)
+            this.tags.applyMatrix()
+
+            // Resolve the promise
+            resolve(this.tags)
+        })
+    }
+
+    // On tag callback
+    _onTag(tag) {
+        console.info('onTag:', tag)
+    }
+
+    // Register on tag callback
+    onTag(callback, context) {
+        this._onTag = tag => callback.call(context || this, tag)
+    }
+
+    // Parse the provided Element and return an Tag collection (recursive)
+    _parseElement(element, parent) {
+        // Create base tag object
+        let tag = new Tag(element, parent)
+
+        // Supported tag ?
+        if (this.parseTags.indexOf(tag.name) === -1) {
+            return this._skipTag(tag, 'unsupported')
+        }
+
+        // Parse the tag
+        let tagParser = new TagParser(tag, parser)
+
+        if (! tagParser.parse()) {
+            return false
+        }
+
+        // Call the on tag callback
+        this._onTag(tag)
+
+        // Parse child nodes
+        let childTag
+
+        element.childNodes.forEach(childNode => {
+            // Parse child element
+            if (childTag = this._parseElement(childNode, tag)) {
+                tag.addChild(childTag)
+            }
+        })
+
+        // Empty group
+        if (['svg', 'g'].indexOf(tag.name) !== -1 && ! tag.children.length) {
+            return this._skipTag(tag, 'empty')
+        }
+
+        // Return tag object
+        return tag
+    }
+
+    // Log skip tag warning message
+    _skipTag(tag, message) {
+        console.warn('Skip tag :', message + ':', tag)
+        return false
+    }
+
+    // Log skip tag attribute warning message
+    _skipTagAttr(tag, attr, message) {
+        console.warn('Skip tag attribute :', message + ':', attr, tag)
+        return false
+    }
+
+}

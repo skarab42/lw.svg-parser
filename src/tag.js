@@ -1,10 +1,168 @@
+import { Path, Point } from './path'
+
+const DEG_TO_RAD = Math.PI / 180
+
 // SVG tag class
 export class Tag {
     // Class constructor...
-    constructor() {
+    constructor(element, parent) {
+        // Init properties
+        this.element       = element
+        this.name          = element.nodeName.toLowerCase()
+        this.parent        = parent || null
+        this.layer         = null
+        this.attrs         = {}
+        this.children      = []
+        this.paths         = []
+        this.matrix        = null
+        this.matrixApplied = false
+        this.path          = new Path()
+        this.point         = new Point(0, 0)
 
+        // Add first path
+        this.paths.push(this.path)
+
+        // Reset/Set transform matrix
+        this.setMatrix(this.parent && this.parent.matrix)
+
+        // Clone parent attributes
+        if (this.parent && this.parent.name === 'g') {
+            // Inherit layer name
+            this.layer = this.parent.layer
+            
+            // Clone parent attributes
+            Object.keys(this.parent.attrs).forEach(key => {
+                this.setAttr(key, this.parent.attrs[key])
+            })
+        }
+    }
+
+    setAttr(name, value) {
+        this.attrs[name] = value
+    }
+
+    getAttr(name, defaultValue) {
+        return this.attrs[name] !== undefined ? this.attrs[name]
+            : (defaultValue !== undefined ? defaultValue : null)
+    }
+
+    getLayerName() {
+        if (this.name === 'g') {
+            return this.getAttr('inkscape:label', this.getAttr('id', null))
+        }
+    }
+
+    setLayerName(name) {
+        if (this.name === 'g') {
+            this.layer = name || this.getLayerName()
+        }
+    }
+
+    addChild(childTag) {
+        this.children.push(childTag)
+    }
+
+    clearPath() {
+        this.path = new Path()
+    }
+
+    newPath() {
+        if (this.path.length > 0) {
+            this.clearPath()
+            this.paths.push(this.path)
+        }
+    }
+
+    closePath() {
+        return this.path.close()
+    }
+
+    addPoint(x, y, relative) {
+        // Relative from the last point
+        if (relative) {
+            x += this.point.x
+            y += this.point.y
+        }
+
+        // Add current point
+        this.path.addPoint(x, y)
+
+        // Update current point
+        this.point = this.path.getPoint(-1)
+    }
+
+    addPoints(points, relative) {
+        // For each couple of points
+        for (let i = 0, il = points.length; i < il; i += 2) {
+            this.addPoint(points[i], points[i + 1], relative)
+        }
+    }
+
+    setMatrix(matrix) {
+        this.matrix        = matrix || [1, 0, 0, 1, 0, 0]
+        this.matrixApplied = false
+    }
+
+    addMatrix(matrix) {
+        this.matrixApplied = false
+        this.matrix        = [
+            this.matrix[0] * matrix[0] + this.matrix[2] * matrix[1],
+            this.matrix[1] * matrix[0] + this.matrix[3] * matrix[1],
+            this.matrix[0] * matrix[2] + this.matrix[2] * matrix[3],
+            this.matrix[1] * matrix[2] + this.matrix[3] * matrix[3],
+            this.matrix[0] * matrix[4] + this.matrix[2] * matrix[5] + this.matrix[4],
+            this.matrix[1] * matrix[4] + this.matrix[3] * matrix[5] + this.matrix[5]
+        ]
+    }
+
+    translate(x, y) {
+        y = y === undefined ? 0 : y
+        this.addMatrix([1, 0, 0, 1, x, y])
+    }
+
+    rotate(angle, x, y) {
+        angle = angle * DEG_TO_RAD
+
+        if (arguments.length == 2) {
+            this.addMatrix([1, 0, 0, 1, x, y])
+        }
+
+        this.addMatrix([Math.cos(angle), Math.sin(angle), -Math.sin(angle), Math.cos(angle), 0, 0])
+
+        if (arguments.length == 2) {
+            this.addMatrix([1, 0, 0, 1, -x, -y])
+        }
+    }
+
+    scale(x, y) {
+        y = y === undefined ? x : y
+        this.addMatrix([x, 0, 0, y, 0, 0])
+    }
+
+    skewX(angle) {
+        this.addMatrix([1, 0, Math.tan(angle * DEG_TO_RAD), 1, 0, 0])
+    }
+
+    skewY(angle) {
+        this.addMatrix([1, Math.tan(angle * DEG_TO_RAD), 0, 1, 0, 0])
+    }
+
+    applyMatrix(matrix) {
+        if (this.matrixApplied) {
+            return null
+        }
+
+        matrix && this.addMatrix(matrix)
+
+        this.paths.forEach(path => {
+            path.transform(this.matrix)
+        })
+
+        this.setMatrix(null)
+        this.matrixApplied = true
+
+        this.children.forEach(tag => {
+            tag.applyMatrix(matrix)
+        })
     }
 }
-
-// Exports default
-export default Tag
