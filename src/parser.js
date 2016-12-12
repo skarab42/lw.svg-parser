@@ -23,8 +23,9 @@ export class Parser {
             'rect', 'circle', 'ellipse', 'path'
         ]
 
-        // Tags list to parse
+        // Tags list to includes/excludes
         this.parseTags = settings.includes || this.supportedTags
+        this.skipTags  = settings.excludes || ['#text']  // silent (no warning)
 
         // User onTag callback ?
         settings.onTag && this.onTag(settings.onTag, settings.onTagContext)
@@ -228,6 +229,11 @@ export class Parser {
     _parseElement(element, parent) {
         // Create base tag object
         let tag = new Tag(element, parent)
+
+        // Exluded tag ?
+        if (this.skipTags.indexOf(tag.name) !== -1) {
+            return null // silent
+        }
 
         // Supported tag ?
         if (this.parseTags.indexOf(tag.name) === -1) {
