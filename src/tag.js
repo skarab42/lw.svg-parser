@@ -7,17 +7,16 @@ class Tag {
     // Class constructor...
     constructor(element, parent) {
         // Init properties
-        this.element       = element
-        this.name          = element.nodeName.toLowerCase()
-        this.parent        = parent || null
-        this.layer         = null
-        this.attrs         = {}
-        this.children      = []
-        this.paths         = []
-        this.matrix        = null
-        this.matrixApplied = false
-        this.path          = new Path()
-        this.point         = new Point(0, 0)
+        this.element  = element
+        this.name     = element.nodeName.toLowerCase()
+        this.parent   = parent || null
+        this.layer    = null
+        this.attrs    = {}
+        this.children = []
+        this.paths    = []
+        this.matrix   = null
+        this.path     = new Path()
+        this.point    = new Point(0, 0)
 
         // Add first path
         this.paths.push(this.path)
@@ -99,13 +98,11 @@ class Tag {
     }
 
     setMatrix(matrix) {
-        this.matrix        = matrix || [1, 0, 0, 1, 0, 0]
-        this.matrixApplied = false
+        this.matrix = matrix || [1, 0, 0, 1, 0, 0]
     }
 
     addMatrix(matrix) {
-        this.matrixApplied = false
-        this.matrix        = [
+        this.matrix = [
             this.matrix[0] * matrix[0] + this.matrix[2] * matrix[1],
             this.matrix[1] * matrix[0] + this.matrix[3] * matrix[1],
             this.matrix[0] * matrix[2] + this.matrix[2] * matrix[3],
@@ -148,10 +145,6 @@ class Tag {
     }
 
     applyMatrix(matrix) {
-        if (this.matrixApplied) {
-            return null
-        }
-
         matrix && this.addMatrix(matrix)
 
         this.paths.forEach(path => {
@@ -159,7 +152,6 @@ class Tag {
         })
 
         this.setMatrix(null)
-        this.matrixApplied = true
 
         this.children.forEach(tag => {
             tag.applyMatrix(matrix)

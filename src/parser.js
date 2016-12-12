@@ -242,7 +242,7 @@ class Parser {
         }
 
         // Parse the tag
-        let tagParser = new TagParser(tag, parser)
+        let tagParser = new TagParser(tag, this)
 
         if (! tagParser.parse()) {
             return false
