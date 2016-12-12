@@ -1,10 +1,10 @@
 let path = require('path')
 
+let output_library  = "SVGParser"
+let output_filename = "lw.svg-parser.js"
+
 let src_path  = path.resolve('./src')
 let dist_path = path.resolve('./dist')
-
-let output_filename = "lw.svg-parser.js"
-let output_library  = "SVGParser"
 
 module.exports = {
     debug: true,

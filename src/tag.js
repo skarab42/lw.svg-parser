@@ -3,7 +3,7 @@ import { Path, Point } from './path'
 const DEG_TO_RAD = Math.PI / 180
 
 // SVG tag class
-export class Tag {
+class Tag {
     // Class constructor...
     constructor(element, parent) {
         // Init properties
@@ -29,7 +29,7 @@ export class Tag {
         if (this.parent && this.parent.name === 'g') {
             // Inherit layer name
             this.layer = this.parent.layer
-            
+
             // Clone parent attributes
             Object.keys(this.parent.attrs).forEach(key => {
                 this.setAttr(key, this.parent.attrs[key])
@@ -166,3 +166,7 @@ export class Tag {
         })
     }
 }
+
+// Exports
+export { Tag }
+export default Tag

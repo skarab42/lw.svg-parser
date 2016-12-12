@@ -3,7 +3,7 @@ import { Tag } from './tag'
 import { TagParser } from './tagparser'
 
 // SVG parser class
-export class Parser {
+class Parser {
     // Class constructor...
     constructor(settings) {
         // Defaults settings
@@ -283,3 +283,7 @@ export class Parser {
     }
 
 }
+
+// Exports
+export { Parser }
+export default Parser

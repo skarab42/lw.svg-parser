@@ -1,4 +1,4 @@
-export class Point {
+class Point {
     // Class constructor...
     constructor(x, y) {
         // Init properties
@@ -16,7 +16,7 @@ export class Point {
     }
 }
 
-export class Path {
+class Path {
     // Class constructor...
     constructor(element, parent) {
         // Init properties
@@ -64,3 +64,7 @@ export class Path {
         })
     }
 }
+
+// Exports
+export { Path, Point }
+export default Path
