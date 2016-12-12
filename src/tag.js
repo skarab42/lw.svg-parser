@@ -22,7 +22,8 @@ class Tag {
         this.paths.push(this.path)
 
         // Reset/Set transform matrix
-        this.setMatrix(this.parent && this.parent.matrix)
+        //this.setMatrix(this.parent && this.parent.matrix)
+        this.setMatrix(null)
 
         // Clone parent attributes
         if (this.parent && this.parent.name === 'g') {
