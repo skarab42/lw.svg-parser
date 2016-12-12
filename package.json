@@ -2,7 +2,7 @@
   "name": "lw.svg-parser",
   "version": "1.0.0",
   "description": "SVG parser for LaserWeb",
-  "main": "./src/index.js",
+  "main": "./dist/lw.svg-parser.js",
   "scripts": {
     "start": "webpack-dev-server --progress --colors",
     "build-prod": "webpack -p --progress --colors",
