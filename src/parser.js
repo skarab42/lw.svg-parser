@@ -16,6 +16,14 @@ class Parser {
         this.defs     = null // Defined <defs> (DOM) nodes list by id
         this.tags     = null // Tag objects hierarchy
 
+        this.traceSettings = Object.assign({
+            linear          : true, // Linear trace mode
+            step            : 0.01, // Step resolution if linear mode = false
+            resolution      : 500,  // number of segments we use to approximate arc length
+            minSegmentLength: 0.01, // Minimum segemnt length
+            segments        : 24    // Numbers of segments
+        }, settings.traceSettings || {})
+
         // Supported tags by this lib
         this.supportedTags = [
             'svg', 'g', 'defs', 'use',
