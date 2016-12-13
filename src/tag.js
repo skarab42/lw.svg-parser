@@ -21,18 +21,21 @@ class Tag {
         // Add first path
         this.paths.push(this.path)
 
-        // Reset/Set transform matrix
-        //this.setMatrix(this.parent && this.parent.matrix)
-        this.setMatrix(null)
+        // Set the matrix
+        this.setMatrix(this.parent && this.parent.matrix)
 
         // Clone parent attributes
-        if (this.parent && this.parent.name === 'g') {
+        if (this.parent && (this.parent.name === 'g' || this.parent.name === 'svg')) {
             // Inherit layer name
             this.layer = this.parent.layer
 
-            // Clone parent attributes
+            // Inherit parent attributes
+            let excludes = ['transform', 'width', 'height']
+
             Object.keys(this.parent.attrs).forEach(key => {
-                this.setAttr(key, this.parent.attrs[key])
+                if (excludes.indexOf(key) === -1) {
+                    this.setAttr(key, this.parent.attrs[key])
+                }
             })
         }
     }

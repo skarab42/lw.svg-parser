@@ -275,14 +275,21 @@ class TagParser {
             return null
         }
 
-        let width      = this.tag.getAttr('width', viewBox[2])
-        let height     = this.tag.getAttr('height', viewBox[3])
+        // Update size attributes
+        let width  = this.tag.getAttr('width', viewBox[2])
+        let height = this.tag.getAttr('height', viewBox[3])
+
+        this.tag.setAttr('width' , width)
+        this.tag.setAttr('height', height)
+
+        // Scale to match viewBox
+        // TODO clip path if preserveAspectRatio.slice
         let scaleX     = width  / viewBox[2]
         let scaleY     = height / viewBox[3]
         let translateX = viewBox[0]
         let translateY = viewBox[1]
 
-        let preserveAspectRatio = this.tag.getAttr('preserveAspectRatio')
+        let preserveAspectRatio = this.tag.getAttr('preserveAspectRatio', 'meet xMidYMid')
 
         if (preserveAspectRatio) {
             let newWidth, newHeight
@@ -328,9 +335,6 @@ class TagParser {
 
         this.tag.scale(scaleX, scaleY)
         this.tag.translate(-translateX, -translateY)
-
-        this.tag.setAttr('width' , width)
-        this.tag.setAttr('height', height)
     }
 
     // Parse transform attribute and set transformations
