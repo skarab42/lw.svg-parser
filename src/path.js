@@ -24,6 +24,16 @@ class Path {
         this.length = 0
     }
 
+    getPoints() {
+        return this.points
+    }
+
+    getFlattenPoints() {
+        let points = []
+        this.points.forEach(point => points.push(point.x, point.y))
+        return points
+    }
+
     getPoint(i) {
         return this.points[i < 0 ? this.length + i : i] || null
     }
