@@ -513,7 +513,7 @@ class TagParser {
         }
 
         // Set matrix from real parent (<use>)
-        //useTag.setMatrix(this.tag.matrix)
+        useTag.setMatrix(this.tag.matrix)
 
         // Replace the use tag with new one
         this.tag.parent.addChild(useTag)
