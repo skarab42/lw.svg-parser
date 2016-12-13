@@ -143,19 +143,29 @@ function createColor(color) {
 
 // UI --------------------------------------------------------------------------
 
-var scene, camera, renderer, mesh;
+var scene, width, height, renderer, canvas, camera, controls, mesh;
 
 function initViewer() {
-    scene  = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
+    scene    = new THREE.Scene();
+    width    = window.innerWidth;
+    height   = window.innerHeight;
+    renderer = new THREE.WebGLRenderer();
+    canvas   = renderer.domElement;
+    camera   = new THREE.PerspectiveCamera(75, width / height, 1, 10000);
+    controls = new THREE.OrbitControls(camera, canvas);
+
+    renderer.setClearColor(0xffffff, 1);
+    renderer.setSize(width, height);
 
     camera.position.z = 1000;
 
-    renderer = new THREE.WebGLRenderer();
-    renderer.setClearColor(0xffffff, 1);
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    controls.enableRotate = true;
+    controls.enableZoom   = true;
+    controls.enableKeys   = false;
 
-    document.body.appendChild(renderer.domElement);
+    controls.target.set(0, 0, 0);
+
+    document.body.appendChild(canvas);
 }
 
 function animate() {
@@ -164,8 +174,10 @@ function animate() {
 }
 
 function resize() {
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.aspect = window.innerWidth / window.innerHeight;
+    width  = window.innerWidth;
+    height = window.innerHeight;
+    renderer.setSize(width, height);
+    camera.aspect = width / height;
     camera.updateProjectionMatrix();
 }
 
