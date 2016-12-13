@@ -1,4 +1,4 @@
-import { Arc } from './trace'
+import { /*trace,*/ Arc, CubicBezier, QuadricBezier } from './trace'
 import { Point } from './path'
 
 // SVG tag parser
@@ -11,6 +11,7 @@ class TagParser {
         this.currentCommand = null
         this.lastCommand    = null
         this.pathData       = null
+        this.traceSettings  = parser.traceSettings
     }
 
     parse() {
@@ -808,11 +809,10 @@ class TagParser {
         // p2  : control point
         // p3  : control point
         // p4  : end point
-        let bezier = new CubicBezier({ p1, p2, p3, p4 })
-        let coords = bezier.trace() // => [x,y, x,y, ...]
-
-        // Remove first point since it is added by last command
-        coords = coords.slice(2)
+        let tracer = new CubicBezier(this.traceSettings)
+        let coords = tracer.trace({ p1, p2, p3, p4 }) // => [x,y, x,y, ...]
+        // let tracer = trace(CubicBezier, this.traceSettings)
+        // let coords = tracer({ p1, p2, p3, p4 })
 
         // Trace the line
         return this._addPoints(coords, false)
@@ -856,11 +856,10 @@ class TagParser {
         // p2  : control point
         // p3  : control point
         // p4  : end point
-        let bezier = new CubicBezier({ p1, p2, p3, p4 })
-        let coords = bezier.trace() // => [x,y, x,y, ...]
-
-        // Remove first point since it is added by last command
-        coords = coords.slice(2)
+        let tracer = new CubicBezier(this.traceSettings)
+        let coords = tracer.trace({ p1, p2, p3, p4 }) // => [x,y, x,y, ...]
+        // let tracer = trace(CubicBezier, this.traceSettings)
+        // let coords = tracer({ p1, p2, p3, p4 })
 
         // Trace the line
         return this._addPoints(coords, false)
@@ -894,11 +893,8 @@ class TagParser {
         // p1  : starting point
         // p2  : control point
         // p3  : end point
-        let bezier = new QuadricBezier({ p1, p2, p3 })
-        let coords = bezier.trace() // => [x,y, x,y, ...]
-
-        // Remove first point since it is added by last command
-        coords = coords.slice(2)
+        let tracer = new QuadricBezier(this.traceSettings)
+        let coords = tracer.trace({ p1, p2, p3 }) // => [x,y, x,y, ...]
 
         // Trace the line
         return this._addPoints(coords, false)
@@ -938,11 +934,8 @@ class TagParser {
         // p1  : starting point
         // p2  : control point
         // p3  : end point
-        let bezier = new QuadricBezier({ p1, p2, p3 })
-        let coords = bezier.trace() // => [x,y, x,y, ...]
-
-        // Remove first point since it is added by last command
-        coords = coords.slice(2)
+        let tracer = new QuadricBezier(this.traceSettings)
+        let coords = tracer.trace({ p1, p2, p3 }) // => [x,y, x,y, ...]
 
         // Trace the line
         return this._addPoints(coords, false)
@@ -970,11 +963,8 @@ class TagParser {
 
         //console.log('A', p1, rx, ry, angle, large, sweep, p2)
 
-        let arc    = new Arc({ p1, rx, ry, angle, large, sweep, p2 })
-        let coords = arc.trace() // => [x,y, x,y, ...]
-
-        // Remove first point since it is added by last command
-        coords = coords.slice(2)
+        let tracer = new Arc(this.traceSettings)
+        let coords = tracer.trace({ p1, rx, ry, angle, large, sweep, p2 }) // => [x,y, x,y, ...]
 
         // Trace the line
         return this._addPoints(coords, false)
