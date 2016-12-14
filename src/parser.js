@@ -16,12 +16,12 @@ class Parser {
         this.defs     = null // Defined <defs> (DOM) nodes list by id
         this.tags     = null // Tag objects hierarchy
 
+        // Trace settings (Arc, Bezier)
         this.traceSettings = Object.assign({
-            linear          : true, // Linear trace mode
-            step            : 0.01, // Step resolution if linear mode = false
-            resolution      : 500,  // number of segments we use to approximate arc length
-            minSegmentLength: 0.01, // Minimum segemnt length
-            segments        : 24    // Numbers of segments
+            linear       : true, // Linear trace mode
+            step         : 0.01, // Step resolution if linear mode = false
+            resolution   : 100,  // Number of segments we use to approximate arc length
+            segmentLength: 1,    // Segment length
         }, settings.traceSettings || {})
 
         // Supported tags by this lib

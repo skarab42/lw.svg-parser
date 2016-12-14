@@ -26,12 +26,11 @@ function angle(v0, v1) {
 class TraceBase {
     constructor(settings) {
         // Set defaults properties
-        this.path             = []   // Points collection [x,y, x,y, ...]
-        this.linear           = true // Linear trace mode
-        this.step             = 0.01 // Step resolution if linear mode = false
-        this.resolution       = 500  // number of segments we use to approximate arc length
-        this.minSegmentLength = 0.01 // Minimum segemnt length
-        this.segments         = 24   // Numbers of segments
+        this.path          = []   // Points collection [x,y, x,y, ...]
+        this.linear        = true // Linear trace mode
+        this.step          = 0.01 // Step resolution if linear mode = false
+        this.resolution    = 500  // Number of segments we use to approximate arc length
+        this.segmentLength = 0.1  // Segment length
 
         // Update properties from user settings
         Object.assign(this, settings || {})
@@ -125,22 +124,18 @@ class TraceBase {
         // Update properties from user settings
         Object.assign(this, settings || {})
 
-        // Create default getPoint wrapper
+        // Default getPoint settings
         let getPoint = 'getPointAtT'
         let step     = this.step
 
         // Linear mode ?
         if (this.linear) {
-            getPoint     = 'getPointAtU'
-            let segments = this.segments
-
             this._approximateLength()
 
-            if (this.arcLength / segments < this.minSegmentLength) {
-                segments = this.arcLength / this.minSegmentLength
-            }
+            let segments = Math.round(this.arcLength / this.segmentLength)
 
-            step = 1 / segments
+            getPoint = 'getPointAtU'
+            step     = 1 / segments
         }
 
         // Clear points list
