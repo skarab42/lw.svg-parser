@@ -183,7 +183,6 @@ class Tag {
 
         // Get fill rule
         let fillRule = this.getAttr('fill-rule', 'nonzero')
-            console.log(fillRule);
             fillRule = fillRule === 'nonzero' ? clipper.PolyFillType.pftNonZero : clipper.PolyFillType.pftEvenOdd
 
         // Create clipper path
