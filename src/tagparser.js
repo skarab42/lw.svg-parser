@@ -1,5 +1,5 @@
-import { /*trace,*/ Arc, CubicBezier, QuadricBezier } from './trace'
-import { Point } from './path'
+import { Arc, CubicBezier, QuadricBezier } from './trace'
+import { Point, Path } from './path'
 
 // SVG tag parser
 class TagParser {
@@ -354,7 +354,7 @@ class TagParser {
         transformations.pop()
 
         // For each transformation
-        let transform, type, params, matrix
+        let transform, type, params
 
         transformations.some(raw => {
             // Split name and value on opening parenthesis

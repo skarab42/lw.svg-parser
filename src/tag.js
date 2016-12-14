@@ -1,4 +1,5 @@
 import { Path, Point } from './path'
+import clipper from 'clipper-lib'
 
 const DEG_TO_RAD = Math.PI / 180
 
@@ -17,6 +18,7 @@ class Tag {
         this.matrix   = null
         this.path     = new Path()
         this.point    = new Point(0, 0)
+        this.shapes   = []
 
         // Add first path
         this.paths.push(this.path)
@@ -155,11 +157,70 @@ class Tag {
             path.transform(this.matrix)
         })
 
+        this.shapes.forEach(shape => {
+            shape.outer.transform(this.matrix)
+            shape.holes.forEach(hole => {
+                hole.transform(this.matrix)
+            })
+        })
+
         this.setMatrix(null)
 
         this.children.forEach(tag => {
             tag.applyMatrix(matrix)
         })
+    }
+
+    getPaths() {
+        return this.paths
+    }
+
+    getShapes() {
+        // No shapes...
+        if (this.getAttr('fill', 'none') === 'none' || ! this.paths[0].length) {
+            return this.shapes
+        }
+
+        // Get fill rule
+        let fillRule = this.getAttr('fill-rule', 'nonzero')
+            console.log(fillRule);
+            fillRule = fillRule === 'nonzero' ? clipper.PolyFillType.pftNonZero : clipper.PolyFillType.pftEvenOdd
+
+        // Create clipper path
+        let clipperPaths = []
+        let clipperScale = 1000000.0
+
+        this.paths.forEach(path => {
+            clipperPaths.push(path.getClipperPoints(clipperScale))
+        })
+
+        // Simplify paths (self-intersecting)
+        clipperPaths = clipper.Clipper.SimplifyPolygons(clipperPaths, fillRule)
+
+        // Clipper paths to PolyTree
+        let cClipper = new clipper.Clipper()
+        let polyTree = new clipper.PolyTree()
+
+        cClipper.AddPaths(clipperPaths, clipper.PolyType.ptSubject, true)
+        cClipper.Execute(clipper.ClipType.ctUnion, polyTree, fillRule, fillRule)
+
+        // PolyTree to ExPolygons
+        let exPolygons = clipper.JS.PolyTreeToExPolygons(polyTree)
+
+        let toPath = path => new Path().fromClipperPoints(path, 1 / clipperScale)
+
+        this.shapes = exPolygons.map(exPolygon => {
+            return {
+                outer: toPath(exPolygon.outer),
+                holes: exPolygon.holes.map(toPath)
+            }
+        })
+
+        // console.log('clipperPaths:', clipperPaths)
+        // console.log('polyTree:', polyTree)
+        // console.log('shapes:', this.shapes)
+
+        return this.shapes
     }
 }
 

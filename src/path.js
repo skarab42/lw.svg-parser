@@ -18,7 +18,7 @@ class Point {
 
 class Path {
     // Class constructor...
-    constructor(element, parent) {
+    constructor() {
         // Init properties
         this.points = []
         this.length = 0
@@ -32,6 +32,18 @@ class Path {
         let points = []
         this.points.forEach(point => points.push(point.x, point.y))
         return points
+    }
+
+    getClipperPoints(scale = 1) {
+        let points = []
+        this.points.forEach(point => points.push({ X: point.x * scale, Y: point.y * scale }))
+        return points
+    }
+
+    fromClipperPoints(points, scale = 1) {
+        this.points = []
+        points.forEach(point => this.addPoint(point.X * scale, point.Y * scale))
+        return this
     }
 
     getPoint(i) {

@@ -75,9 +75,13 @@ function drawTag(tag) {
 
     // Draw object paths if almost one is present
     if (tag.paths.length && tag.paths[0].length) {
-        console.info('draw:', tag);
+        console.info('draw:', object, tag);
 
-        tag.paths.forEach(function(path) {
+        tag.getShapes().forEach(function(shape) {
+            object.add(drawShape(tag, shape));
+        });
+
+        tag.getPaths().forEach(function(path) {
             object.add(drawLine(tag, path));
         });
     }
@@ -92,6 +96,8 @@ function drawTag(tag) {
 }
 
 function drawLine(tag, path) {
+    console.log('line:', path);
+
     var geometry = new THREE.Geometry();
     var material = this.createLineMaterial(tag);
 
@@ -106,6 +112,35 @@ function createLineMaterial(tag) {
     return new THREE.LineBasicMaterial({ color: this.createColor(
         tag.getAttr('stroke', tag.getAttr('fill', 'black'))
     )});
+}
+
+function createSolidMaterial(tag) {
+    var opacity  = tag.getAttr('fillOpacity', 1);
+    var material = new THREE.MeshBasicMaterial({
+        color: tag.getAttr('fill', 'black')
+    });
+
+    if (opacity < 1) {
+        material.transparent = true;
+        material.opacity     = opacity;
+    }
+
+    return material;
+};
+
+function drawShape(tag, path) {
+    console.log('shape:', path);
+
+    let shape = new THREE.Shape(path.outer.points);
+
+    path.holes.forEach(function(hole) {
+        shape.holes.push(new THREE.Path(hole.points));
+    });
+
+    var geometry = new THREE.ShapeGeometry(shape);
+    var material = createSolidMaterial(tag);
+
+    return new THREE.Mesh(geometry, material);
 }
 
 function createColor(color) {
@@ -187,7 +222,6 @@ function addObject(name, object) {
 }
 
 $(document).ready(function() {
-
     // On file input change
     $('#file').on('change', function(event) {
         var files = Array.prototype.slice.call(event.target.files);
