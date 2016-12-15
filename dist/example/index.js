@@ -135,17 +135,31 @@ function drawLine(tag, path) {
 }
 
 function createLineMaterial(tag) {
-    return new THREE.LineBasicMaterial({ color: this.createColor(
+    var opacity  = tag.getAttr('stroke-opacity', 1);
+    var material = new THREE.LineBasicMaterial({ color: this.createColor(
         tag.getAttr('stroke', tag.getAttr('fill', 'black'))
     )});
+
+    material.depthWrite = false;
+    material.depthTest  = false;
+
+    if (opacity < 1) {
+        material.transparent = true;
+        material.opacity     = opacity;
+    }
+
+    return material;
 }
 
 function createSolidMaterial(tag) {
-    var opacity  = tag.getAttr('fillOpacity', 1);
+    var opacity  = tag.getAttr('fill-opacity', 1);
     var material = new THREE.MeshBasicMaterial({
-        color: tag.getAttr('fill', 'black'),
+        color: this.createColor(tag.getAttr('fill', 'black')),
         side : THREE.DoubleSide
     });
+
+    material.depthWrite = false;
+    material.depthTest  = false;
 
     if (opacity < 1) {
         material.transparent = true;
@@ -181,7 +195,7 @@ function createColor(color) {
     var g = color.g * 255;
     var b = color.b * 255;
 
-    // Darken too light colors...
+    /*// Darken too light colors...
     var luma, lumaLimit = 200;
 
     while (true) {
@@ -194,7 +208,7 @@ function createColor(color) {
         r > 0 && (r -= 1);
         g > 0 && (g -= 1);
         b > 0 && (b -= 1);
-    }
+    }*/
 
     // Create color object ([0-255] to [0-1] range)
     color = new THREE.Color(r / 255, g / 255, b / 255);
@@ -244,8 +258,49 @@ function resize() {
 }
 
 function addObject(name, object) {
+    addUIObject(name, object);
     object.name = name;
     scene.add(object);
+}
+
+function removeObject(object) {
+    scene.remove(object);
+}
+
+function addUIObject(name, object) {
+    var file     = $('<li>').attr('id', object.uuid).data('object', object);
+    var filename = $('<span></span>').addClass('filename');
+    var buttons  = $('<span></span>').addClass('buttons');
+    var hide     = $('<i class="fa fa-eye" title="Visible"></i>');
+    var show     = $('<i class="fa fa-eye-slash" style="display:none;" title="Hidden"></i>');
+    var remove   = $('<i class="fa fa-trash"></i>');
+
+    filename.html(name);
+    buttons.append(remove, show, hide);
+    file.append(buttons, filename);
+
+    $('#files').append(file);
+    $('#noFiles').hide();
+
+    remove.on('click', function() {
+        removeUIObject(object);
+        removeObject(object);
+    })
+
+    function toggle() {
+        show.toggle();
+        hide.toggle();
+
+        object.visible = hide.is(':visible');
+    }
+
+    show.on('click', toggle)
+    hide.on('click', toggle)
+}
+
+function removeUIObject(object) {
+    $('#' + object.uuid).remove();
+    $('#noFiles').toggle(! $('#files').children().length);
 }
 
 $(document).ready(function() {
