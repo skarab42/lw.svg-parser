@@ -39,7 +39,7 @@ class Parser {
         // User onTag callback ?
         settings.onTag && this.onTag(settings.onTag, settings.onTagContext)
     }
-
+    
     // Load raw XML string, XMLDocument, Element or File object
     load(input) {
         // Load raw XML string
@@ -226,7 +226,7 @@ class Parser {
 
     // On tag callback
     _onTag(tag) {
-        console.info('onTag:', tag)
+        //console.info('onTag:', tag)
     }
 
     // Register on tag callback
