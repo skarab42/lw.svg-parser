@@ -65,7 +65,7 @@ class TagParser {
 
         // If style attribute (override tag attributes)
         // TODO get/parse global style and override this one...
-        style && style.split(';').some(attr => {
+        style && style.replace(/;$/, '').split(';').some(attr => {
             // Current style
             attr = attr.split(':')
             attr = { nodeName: attr[0], nodeValue: attr[1] }
