@@ -25,7 +25,7 @@ SVG parser for [LaserWeb/CNCWeb](https://github.com/LaserWeb/LaserWeb4).
     linear       : true, // Linear trace mode
     step         : 0.01, // Step resolution if linear mode = false
     resolution   : 100,  // Number of segments we use to approximate arc length
-    segmentLength: 1,    // Segment length
+    segmentLength: 1     // Segment length
   },
   onTag: tag => {} // Called after a tag is parsed
 }
