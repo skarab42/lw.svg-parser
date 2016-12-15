@@ -34,15 +34,15 @@ class Path {
         return points
     }
 
-    getClipperPoints(scale = 1) {
+    getClipperPoints(scaleUp = 1) {
         let points = []
-        this.points.forEach(point => points.push({ X: point.x * scale, Y: point.y * scale }))
+        this.points.forEach(point => points.push({ X: parseInt(point.x * scaleUp), Y: parseInt(point.y * scaleUp) }))
         return points
     }
 
-    fromClipperPoints(points, scale = 1) {
+    fromClipperPoints(points, scaleDown = 1) {
         this.points = []
-        points.forEach(point => this.addPoint(point.X * scale, point.Y * scale))
+        points.forEach(point => this.addPoint(parseFloat(point.X * scaleDown), parseFloat(point.Y * scaleDown)))
         return this
     }
 

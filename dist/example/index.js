@@ -1,61 +1,78 @@
+// Debug...
+var debug = false;
+
 // Create Parser object
 var parser = new SVGParser.Parser();
 
 // Register the onTag callback
 parser.onTag(function(tag) {
-    console.info('onTag:', tag);
+    log('onTag:', tag);
 });
 
 // Load multiple files (sync)
 function loadFiles(files) {
     var file = files.shift();
 
-    console.groupCollapsed('open: ' + file.name);
+    logStart('open: ' + file.name);
 
     loadFile(file).then(function() {
-        console.groupEnd();
+        logEnd();
         files.length && loadFiles(files);
     });
 }
 
 // Load one file
 function loadFile(file) {
-    console.groupCollapsed('loading');
-    console.log('file:', file);
+    logStart('loading');
+    log('file:', file);
 
     // Load SVG from file
     return parser.loadFromFile(file).then(function(element) {
-        console.log('element:', element);
-        console.groupEnd();
+        log('element:', element);
+        logEnd();
 
         // Parse the file and return a promise
-        console.groupCollapsed('parsing');
+        logStart('parsing');
         return parser.parse().then(function(tags) {
-            console.groupEnd();
+            logEnd();
 
-            console.groupCollapsed('result');
-            console.log('document:', parser.document);
-            console.log('editor:', parser.editor);
-            console.log('tags:', parser.tags);
-            console.groupEnd();
+            logStart('result');
+            log('document:', parser.document);
+            log('editor:', parser.editor);
+            log('tags:', parser.tags);
+            logEnd();
 
-            console.groupCollapsed('drawing');
+            logStart('drawing');
             drawFile(file, tags);
-            console.groupEnd();
+            logEnd();
         });
     })
     .catch(function(error) {
-        console.groupEnd();
+        logEnd();
         console.error('error:', error);
     });
 
     // Same as above but shorter
     // return parser.parse(file).then(function(tags) {
-    //     console.log('tags:', tags);
+    //     log('tags:', tags);
     // })
     // .catch(function(error) {
     //     console.error('error:', error);
     // });
+}
+
+// Dubug -----------------------------------------------------------------------
+
+function logStart(label) {
+    debug && console.groupCollapsed(label);
+}
+
+function log() {
+    debug && console.log.apply(console, Array.prototype.slice.call(arguments, 0));
+}
+
+function logEnd() {
+    debug && console.groupEnd();
 }
 
 // Draw ------------------------------------------------------------------------
@@ -63,7 +80,7 @@ function loadFile(file) {
 function drawFile(file, tags) {
     // Flip Y coords and move UP by document height
     // (to set origin at bottom/left corners)
-    tags.applyMatrix([1, 0, 0, -1, 0, parser.document.height]);
+    // tags.applyMatrix([1, 0, 0, -1, 0, parser.document.height]);
 
     // Draw and add the object
     addObject(file.name, drawTag(tags));
@@ -75,7 +92,7 @@ function drawTag(tag) {
 
     // Draw object paths if almost one is present
     if (tag.paths.length && tag.paths[0].length) {
-        console.info('draw:', object, tag);
+        log('draw:', object, tag);
 
         tag.getShapes().forEach(function(shape) {
             object.add(drawShape(tag, shape));
@@ -96,7 +113,7 @@ function drawTag(tag) {
 }
 
 function drawLine(tag, path) {
-    console.log('line:', path);
+    log('line:', path);
 
     var geometry = new THREE.Geometry();
     var material = this.createLineMaterial(tag);
@@ -129,7 +146,7 @@ function createSolidMaterial(tag) {
 };
 
 function drawShape(tag, path) {
-    console.log('shape:', path);
+    log('shape:', path);
 
     let shape = new THREE.Shape(path.outer.points);
 

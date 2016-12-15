@@ -186,39 +186,41 @@ class Tag {
             fillRule = fillRule === 'nonzero' ? clipper.PolyFillType.pftNonZero : clipper.PolyFillType.pftEvenOdd
 
         // Create clipper path
+        let cPolyTree    = new clipper.PolyTree()
+        let cClipper     = new clipper.Clipper()
+        let clipperScale = 10000000
         let clipperPaths = []
-        let clipperScale = 1000000.0
 
         this.paths.forEach(path => {
             clipperPaths.push(path.getClipperPoints(clipperScale))
         })
 
-        // Simplify paths (self-intersecting)
-        clipperPaths = clipper.Clipper.SimplifyPolygons(clipperPaths, fillRule)
-
-        // Clipper paths to PolyTree
-        let cClipper = new clipper.Clipper()
-        let polyTree = new clipper.PolyTree()
-
         cClipper.AddPaths(clipperPaths, clipper.PolyType.ptSubject, true)
-        cClipper.Execute(clipper.ClipType.ctUnion, polyTree, fillRule, fillRule)
+        cClipper.Execute(clipper.ClipType.ctUnion, cPolyTree, fillRule, fillRule)
+
+        let paths     = clipper.Clipper.PolyTreeToPaths(cPolyTree)
+        let polygones = clipper.Clipper.SimplifyPolygons(paths, fillRule)
+
+        // Single path (no hole)
+        if (this.paths.length > 1) {
+            cClipper.Clear()
+            cClipper.StrictlySimple = true
+            cPolyTree = new clipper.PolyTree()
+            cClipper.AddPaths(polygones, clipper.PolyType.ptSubject, true)
+            cClipper.Execute(clipper.ClipType.ctUnion, cPolyTree, fillRule, fillRule)
+        }
 
         // PolyTree to ExPolygons
-        let exPolygons = clipper.JS.PolyTreeToExPolygons(polyTree)
-
-        let toPath = path => new Path().fromClipperPoints(path, 1 / clipperScale)
-
-        this.shapes = exPolygons.map(exPolygon => {
+        let toPath     = path => new Path().fromClipperPoints(path, 1 / clipperScale)
+        let exPolygons = clipper.JS.PolyTreeToExPolygons(cPolyTree)
+        this.shapes    = exPolygons.map(exPolygon => {
             return {
                 outer: toPath(exPolygon.outer),
                 holes: exPolygon.holes.map(toPath)
             }
         })
 
-        // console.log('clipperPaths:', clipperPaths)
-        // console.log('polyTree:', polyTree)
-        // console.log('shapes:', this.shapes)
-
+        // Return shapes...
         return this.shapes
     }
 }
