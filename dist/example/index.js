@@ -86,6 +86,11 @@ function drawFile(file, tags) {
     addObject(file.name, drawTag(tags));
 }
 
+function flipY(object) {
+    object.scale.y = -1;
+    object.children.forEach(flipY);
+}
+
 function drawTag(tag) {
     // Create 3D object
     var object = new THREE.Object3D();
@@ -95,11 +100,15 @@ function drawTag(tag) {
         log('draw:', object, tag);
 
         tag.getShapes().forEach(function(shape) {
-            object.add(drawShape(tag, shape));
+            shape = drawShape(tag, shape)
+            object.add(shape);
+            flipY(shape)
         });
 
         tag.getPaths().forEach(function(path) {
-            object.add(drawLine(tag, path));
+            path = drawLine(tag, path)
+            object.add(path);
+            flipY(path)
         });
     }
 
@@ -134,7 +143,8 @@ function createLineMaterial(tag) {
 function createSolidMaterial(tag) {
     var opacity  = tag.getAttr('fillOpacity', 1);
     var material = new THREE.MeshBasicMaterial({
-        color: tag.getAttr('fill', 'black')
+        color: tag.getAttr('fill', 'black'),
+        side : THREE.DoubleSide
     });
 
     if (opacity < 1) {
