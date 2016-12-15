@@ -18,7 +18,7 @@ SVG parser for [LaserWeb/CNCWeb](https://github.com/LaserWeb/LaserWeb4).
 
 ## Settings (all are optional)
 ```javascript
-{
+let settings = {
   includes: ['svg', 'g', 'defs', 'use', 'line', 'polyline', 'polygon', 'rect', 'circle', 'ellipse', 'path', 'title', 'desc'],
   excludes: ['#text', '#comment'],
   traceSettings: { // Arc, Bezier curves only
