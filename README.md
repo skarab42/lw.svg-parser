@@ -1,4 +1,4 @@
-# lw.svg-parser ([demo](https://lautr3k.github.io/lw.svg-parser/dist/example/))
+# lw.svg-parser
 SVG parser for [LaserWeb/CNCWeb](https://github.com/LaserWeb/LaserWeb4).
 
 ## Supported tags
@@ -16,6 +16,9 @@ SVG parser for [LaserWeb/CNCWeb](https://github.com/LaserWeb/LaserWeb4).
 - Clipping paths with [Clipper.js](https://sourceforge.net/projects/jsclipper/)
 - Promise mechanism
 - ES6 / UMD module
+
+## Demo
+https://lautr3k.github.io/lw.svg-parser/dist/example/
 
 ## Settings (all are optional)
 ```javascript
