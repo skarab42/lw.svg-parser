@@ -15,6 +15,7 @@ SVG parser for [LaserWeb/CNCWeb](https://github.com/LaserWeb/LaserWeb4).
 - ViewBox, PreserveAspectRatio
 - Clipping paths with [Clipper.js](https://sourceforge.net/projects/jsclipper/)
 - Promise mechanism
+- ES6 / UMD module
 
 ## Settings (all are optional)
 ```javascript
@@ -29,6 +30,27 @@ let settings = {
   },
   onTag: tag => {} // Called after a tag is parsed
 }
+```
+
+## Installation
+Using NPM
+```
+npm install lw.svg-parser
+```
+
+Using GIT
+```
+git clone https://github.com/lautr3k/lw.svg-parser.git
+cd svg-parser
+npm install
+```
+
+Or download the last build from https://raw.githubusercontent.com/lautr3k/lw.svg-parser/master/dist/lw.svg-parser.js
+```html
+<script src="./lw.svg-parser.js"></script>
+<script>
+  var parser = SVGParser.Parser();
+</script>
 ```
 
 ## Usages
