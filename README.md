@@ -20,21 +20,6 @@ SVG parser for [LaserWeb/CNCWeb](https://github.com/LaserWeb/LaserWeb4).
 ## Demo
 https://lautr3k.github.io/lw.svg-parser/dist/example/
 
-## Settings (all are optional)
-```javascript
-let settings = {
-  includes: ['svg', 'g', 'defs', 'use', 'line', 'polyline', 'polygon', 'rect', 'circle', 'ellipse', 'path', 'title', 'desc'],
-  excludes: ['#text', '#comment'],
-  traceSettings: { // Arc, Bezier curves only
-    linear       : true, // Linear trace mode
-    step         : 0.01, // Step resolution if linear mode = false
-    resolution   : 100,  // Number of segments we use to approximate arc length
-    segmentLength: 1     // Segment length
-  },
-  onTag: tag => {} // Called after a tag is parsed
-}
-```
-
 ## Installation
 Using NPM
 ```
@@ -54,6 +39,21 @@ Or download the last build from https://raw.githubusercontent.com/lautr3k/lw.svg
 <script>
   var parser = SVGParser.Parser();
 </script>
+```
+
+## Settings (all are optional)
+```javascript
+let settings = {
+  includes: ['svg', 'g', 'defs', 'use', 'line', 'polyline', 'polygon', 'rect', 'circle', 'ellipse', 'path', 'title', 'desc'],
+  excludes: ['#text', '#comment'],
+  traceSettings: { // Arc, Bezier curves only
+    linear       : true, // Linear trace mode
+    step         : 0.01, // Step resolution if linear mode = false
+    resolution   : 100,  // Number of segments we use to approximate arc length
+    segmentLength: 1     // Segment length
+  },
+  onTag: tag => {} // Called after a tag is parsed
+}
 ```
 
 ## Usages
