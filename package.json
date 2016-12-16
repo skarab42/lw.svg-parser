@@ -32,6 +32,8 @@
     "webpack-dev-server": "^1.16.2"
   },
   "dependencies": {
-    "clipper-lib": "^6.2.1"
+    "clipper-lib": "^6.2.1",
+    "lw.svg-curves": "^0.1.0",
+    "lw.svg-path": "^0.1.0"
   }
 }

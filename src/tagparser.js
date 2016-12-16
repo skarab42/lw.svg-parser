@@ -1,5 +1,5 @@
-import { Arc, CubicBezier, QuadricBezier } from './trace'
-import { Point, Path } from './path'
+import { Arc, CubicBezier, QuadricBezier } from 'lw.svg-curves'
+import { Point, Path } from 'lw.svg-path'
 
 // SVG tag parser
 class TagParser {

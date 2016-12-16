@@ -1,4 +1,4 @@
-import { Path, Point } from './path'
+import { Path, Point } from 'lw.svg-path'
 import clipper from 'clipper-lib'
 
 const DEG_TO_RAD = Math.PI / 180
