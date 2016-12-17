@@ -39,6 +39,13 @@ class TagParser {
             return null
         }
 
+        // Get viewBox attribute if any
+        let viewBox = attrs.getNamedItem('viewBox')
+
+        if (viewBox) {
+            this.tag.setAttr('viewBox', this._normalizeTagAttrPoints(viewBox))
+        }
+
         // For each attribute
         let attr, value, style
 
@@ -114,6 +121,11 @@ class TagParser {
             // Normalize size unit -> to px
             case 'x':
             case 'y':
+            case 'width':
+            case 'height':
+                value = this._normalizeTagAttrUnit(attr)
+            break
+
             case 'x1':
             case 'y1':
             case 'x2':
@@ -123,23 +135,25 @@ class TagParser {
             case 'ry':
             case 'cx':
             case 'cy':
-            case 'width':
-            case 'height':
-            case 'fontSize':
-            case 'strokeWidth':
-                value = this._normalizeTagAttrUnit(attr)
+            case 'font-size':
+            case 'stroke-width':
+                value = this._normalizeTagAttrUnit(attr, true)
             break
 
             // Normalize points attribute
             case 'points':
-            case 'viewBox':
+            //case 'viewBox':
                 value = this._normalizeTagAttrPoints(attr)
+            break
+
+            case 'viewBox':
+                value = false
             break
 
             // Range limit to [0 - 1]
             case 'opacity':
-            case 'fillOpacity':
-            case 'strokeOpacity':
+            case 'fill-opacity':
+            case 'stroke-opacity':
                 value = this._normalizeTagAttrRange(attr, 0, 1)
             break
 
@@ -153,7 +167,7 @@ class TagParser {
     }
 
     // Normalize attribute unit to px
-    _normalizeTagAttrUnit(attr) {
+    _normalizeTagAttrUnit(attr, ratio) {
         let stringValue = attr.nodeValue.toLowerCase()
         let floatValue  = parseFloat(stringValue)
 
@@ -179,6 +193,34 @@ class TagParser {
 
         if (stringValue.indexOf('pc') !== -1) {
             return floatValue * 15.0
+        }
+
+        if (stringValue.indexOf('%') !== -1) {
+            let viewBox = this.tag.getAttr('viewBox', this.tag.parent && this.tag.parent.getAttr('viewBox'))
+
+            switch (attr.nodeName) {
+                case 'x':
+                case 'width':
+                    floatValue *= viewBox[2] / 100
+                break
+                case 'y':
+                case 'height':
+                    floatValue *= viewBox[3] / 100
+                break
+            }
+        }
+
+        if (stringValue.indexOf('em') !== -1) {
+            let fontSize = this.tag.getAttr('font-size', 16)
+
+            switch (attr.nodeName) {
+                case 'x':
+                case 'y':
+                case 'width':
+                case 'height':
+                    floatValue *= fontSize
+                break
+            }
         }
 
         return floatValue
