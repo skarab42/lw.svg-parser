@@ -88,6 +88,7 @@ function drawFile(file, tags) {
 
 function flipY(object) {
     object.scale.y = -1;
+    object.position.y += parser.document.height;
     object.children.forEach(flipY);
 }
 
