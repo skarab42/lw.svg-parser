@@ -34,6 +34,10 @@ class Tag {
             // Inherit parent attributes
             let excludes = ['transform', 'width', 'height']
 
+            if (this.name !== 'g' && this.name !== 'svg') {
+                excludes.push('viewBox')
+            }
+
             Object.keys(this.parent.attrs).forEach(key => {
                 if (excludes.indexOf(key) === -1) {
                     this.setAttr(key, this.parent.attrs[key])
