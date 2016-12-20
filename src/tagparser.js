@@ -530,6 +530,18 @@ class TagParser {
         return false
     }
 
+    _image() {
+        // console.log(this.tag.getAttr('xlink:href'))
+        // Handled tag
+        return true
+    }
+
+    _text() {
+        // console.log(this.tag.element.textContent)
+        // Handled tag
+        return true
+    }
+
     _defs() {
         // Register all child element with an id attribute
         this.tag.element.childNodes.forEach(childNode => {

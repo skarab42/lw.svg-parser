@@ -3,12 +3,11 @@ SVG parser for [LaserWeb/CNCWeb](https://github.com/LaserWeb/LaserWeb4).
 
 ## Supported tags
 ```html
-<svg>
-<title> <desc>
+<svg> <title> <desc>
 <g> <defs> <use>
 <line> <polyline> <polygon>
 <rect> <circle> <ellipse>
-<path>
+<path> <image> <text>
 ```
 
 ## Features
@@ -44,7 +43,7 @@ Or download the last build from https://raw.githubusercontent.com/lautr3k/lw.svg
 ## Settings (all are optional)
 ```javascript
 let settings = {
-  includes: ['svg', 'g', 'defs', 'use', 'line', 'polyline', 'polygon', 'rect', 'circle', 'ellipse', 'path', 'title', 'desc'],
+  includes: ['svg', 'g', 'defs', 'use', 'line', 'polyline', 'polygon', 'rect', 'circle', 'ellipse', 'path', 'title', 'desc', 'image', 'text'],
   excludes: ['#text', '#comment'],
   traceSettings: { // Arc, Bezier curves only
     linear       : true, // Linear trace mode
