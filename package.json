@@ -1,6 +1,6 @@
 {
   "name": "lw.svg-parser",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "SVG parser for LaserWeb",
   "main": "./dist/lw.svg-parser.js",
   "scripts": {
