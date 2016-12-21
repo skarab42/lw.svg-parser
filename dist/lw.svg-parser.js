@@ -534,6 +534,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'clearPath',
 	        value: function clearPath() {
 	            this.path = new _lw.Path();
+	            this.point = new _lw.Point(0, 0);
 	        }
 	    }, {
 	        key: 'newPath',
@@ -546,7 +547,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'closePath',
 	        value: function closePath() {
-	            return this.path.close();
+	            // Close path
+	            var close = this.path.close();
+	
+	            // Update current point
+	            var point = this.path.getPoint(-1);
+	            this.point = new _lw.Point(point.x, point.y);
+	
+	            // Return close result
+	            return close;
 	        }
 	    }, {
 	        key: 'addPoint',
@@ -561,7 +570,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.path.addPoint(x, y);
 	
 	            // Update current point
-	            this.point = this.path.getPoint(-1);
+	            this.point = new _lw.Point(x, y);
 	        }
 	    }, {
 	        key: 'addPoints',
@@ -8155,7 +8164,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return this.parser._skipTag(this.tag, 'the number of points must be even');
 	            }
 	
-	            relative = arguments.length < 2 && this.currentCommand.relative;
+	            //relative = arguments.length < 2 && this.currentCommand.relative
+	            if (relative === undefined) {
+	                relative = this.currentCommand.relative;
+	            }
 	
 	            this.tag.addPoints(points, relative);
 	            return true;
@@ -8496,13 +8508,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: '_pathM',
 	        value: function _pathM(points) {
+	            // Current point
+	            var x = this.tag.point.x;
+	            var y = this.tag.point.y;
+	            var rl = this.currentCommand.relative;
+	
+	            // First point (start of new path)
+	            var firstPoint = points.splice(0, 2);
+	
 	            // New path
 	            this._newPath();
 	
-	            // Set the current point (start of new path)
+	            // Relative moveTo (First moveTo is always absolute)
+	            if (rl && this.tag.paths.length > 1) {
+	                firstPoint[0] += x;
+	                firstPoint[1] += y;
+	            }
+	
+	            // Add first point
+	            var result = this._addPoints(firstPoint, false);
+	
 	            // If is followed by multiple pairs of coordinates,
 	            // the subsequent pairs are treated as implicit lineto commands.
-	            return this._addPoints(points);
+	            if (result && points.length) {
+	                result = this._addPoints(points);
+	            }
+	
+	            // Return result
+	            return result;
 	        }
 	    }, {
 	        key: '_pathZ',
