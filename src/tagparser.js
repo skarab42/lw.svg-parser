@@ -461,7 +461,10 @@ class TagParser {
             return this.parser._skipTag(this.tag, 'the number of points must be even')
         }
 
-        relative = arguments.length < 2 && this.currentCommand.relative
+        //relative = arguments.length < 2 && this.currentCommand.relative
+        if (relative === undefined) {
+            relative = this.currentCommand.relative
+        }
 
         this.tag.addPoints(points, relative)
         return true
@@ -805,13 +808,34 @@ class TagParser {
     }
 
     _pathM(points) {
+        // Current point
+        let x  = this.tag.point.x
+        let y  = this.tag.point.y
+        let rl = this.currentCommand.relative
+
+        // First point (start of new path)
+        let firstPoint = points.splice(0, 2)
+
         // New path
         this._newPath()
 
-        // Set the current point (start of new path)
+        // Relative moveTo (First moveTo is always absolute)
+        if (rl && this.tag.paths.length > 1) {
+            firstPoint[0] += x
+            firstPoint[1] += y
+        }
+
+        // Add first point
+        let result = this._addPoints(firstPoint, false)
+
         // If is followed by multiple pairs of coordinates,
         // the subsequent pairs are treated as implicit lineto commands.
-        return this._addPoints(points)
+        if (result && points.length) {
+            result = this._addPoints(points)
+        }
+
+        // Return result
+        return result
     }
 
     _pathZ() {

@@ -72,7 +72,8 @@ class Tag {
     }
 
     clearPath() {
-        this.path = new Path()
+        this.path  = new Path()
+        this.point = new Point(0, 0)
     }
 
     newPath() {
@@ -83,7 +84,15 @@ class Tag {
     }
 
     closePath() {
-        return this.path.close()
+        // Close path
+        let close = this.path.close()
+
+        // Update current point
+        let point  = this.path.getPoint(-1)
+        this.point = new Point(point.x, point.y)
+
+        // Return close result
+        return close
     }
 
     addPoint(x, y, relative) {
@@ -97,7 +106,7 @@ class Tag {
         this.path.addPoint(x, y)
 
         // Update current point
-        this.point = this.path.getPoint(-1)
+        this.point = new Point(x, y)
     }
 
     addPoints(points, relative) {
