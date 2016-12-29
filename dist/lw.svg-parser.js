@@ -8438,7 +8438,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	
 	            // Split on each commands
-	            var commands = dAttr.match(/([M|Z|L|H|V|C|S|Q|T|A]+([^M|Z|L|H|V|C|S|Q|T|A]+)?)/gi);
+	            var commands = dAttr.match(/([M|Z|L|H|V|C|S|Q|T|A]([^M|Z|L|H|V|C|S|Q|T|A]+)?)/gi);
 	
 	            if (!commands) {
 	                return this.parser._skipTag(this.tag, 'malformed "d" attribute');
