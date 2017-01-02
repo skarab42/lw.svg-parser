@@ -555,17 +555,28 @@ class TagParser {
         return false
     }
 
+    _symbol() {
+        if (this.tag.element.id){
+            this.parser.symbols[this.tag.element.id] = this.tag.element;
+        }
+
+        return true
+    }
+
     _use() {
         // Get the target id
         let target  = this.tag.getAttr('xlink:href').replace(/^#/, '')
 
         // Try to get the defined element
         let element = this.parser.defs[target]
-
+        
+        if (! element)
+            element = this.parser.symbols[target];
+        
         if (! element) {
             return this.parser._skipTag(this.tag, 'undefined reference [' + target + ']')
         }
-
+        
         // Parse the defined element and set new parent from <use> tag parent
         let useTag = this.parser._parseElement(element, this.tag.parent)
 
