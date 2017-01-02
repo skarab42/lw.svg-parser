@@ -568,11 +568,8 @@ class TagParser {
         let target  = this.tag.getAttr('xlink:href').replace(/^#/, '')
 
         // Try to get the defined element
-        let element = this.parser.defs[target]
-        
-        if (! element)
-            element = this.parser.symbols[target];
-        
+        let element = this.parser.defs[target] || this.parser.symbols[target];
+                
         if (! element) {
             return this.parser._skipTag(this.tag, 'undefined reference [' + target + ']')
         }
