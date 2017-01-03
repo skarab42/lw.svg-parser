@@ -272,7 +272,7 @@ class Parser {
         })
 
         // Empty group
-        if (['svg', 'g'].indexOf(tag.name) !== -1 && ! tag.children.length) {
+        if (['svg', 'g', 'defs', 'symbol', 'use'].indexOf(tag.name) !== -1 && ! tag.children.length) {
             return this._skipTag(tag, 'empty')
         }
 
