@@ -14,6 +14,7 @@ class Parser {
         this.editor   = null // Editor info { name, version, fingerprint }
         this.document = null // Document info { width, height, viewBox }
         this.defs     = null // Defined <defs> (DOM) nodes list by id
+        this.symbols  = null // Defined <symbol> (DOM) node with mandatory id
         this.tags     = null // Tag objects hierarchy
 
         // Trace settings (Arc, Bezier)
@@ -26,7 +27,7 @@ class Parser {
 
         // Supported tags by this lib
         this.supportedTags = [
-            'svg', 'g', 'defs', 'use',
+            'svg', 'g', 'defs', 'symbol', 'use',
             'line', 'polyline', 'polygon',
             'rect', 'circle', 'ellipse', 'path',
             'title', 'desc', 'image', 'text'
@@ -192,6 +193,7 @@ class Parser {
         this.document = null
         this.defs     = {}
         this.tags     = null
+        this.symbols  = {}
 
         // Load input if provided
         if (input) {
@@ -239,7 +241,7 @@ class Parser {
         // Create base tag object
         let tag = new Tag(element, parent)
 
-        // Exluded tag ?
+        // Excluded tag ?
         if (this.skipTags.indexOf(tag.name) !== -1) {
             return null // silent
         }
@@ -270,7 +272,7 @@ class Parser {
         })
 
         // Empty group
-        if (['svg', 'g'].indexOf(tag.name) !== -1 && ! tag.children.length) {
+        if (['svg', 'g', 'defs', 'symbol', 'use'].indexOf(tag.name) !== -1 && ! tag.children.length) {
             return this._skipTag(tag, 'empty')
         }
 

@@ -555,29 +555,49 @@ class TagParser {
         return false
     }
 
+    _symbol() {
+        if (this.tag.element.id){
+            let collection=[];
+            this.tag.element.childNodes.forEach((node)=>{collection.push(node)})
+            this.parser.symbols[this.tag.element.id] = collection;
+        }
+
+        // Skipped tag
+        return false
+    }
+
     _use() {
         // Get the target id
         let target  = this.tag.getAttr('xlink:href').replace(/^#/, '')
 
         // Try to get the defined element
-        let element = this.parser.defs[target]
+        let element = this.parser.defs[target] || this.parser.symbols[target];
 
         if (! element) {
             return this.parser._skipTag(this.tag, 'undefined reference [' + target + ']')
         }
+        
+        // Parse the defined element and set new parent from <use> tag parent. Supports array of nodes
+        let useElement=(elements) => {
 
-        // Parse the defined element and set new parent from <use> tag parent
-        let useTag = this.parser._parseElement(element, this.tag.parent)
+            if (!Array.isArray(elements)) { elements = [elements] }
 
-        if (! useTag) {
-            return this.parser._skipTag(this.tag, 'empty reference [' + target + ']')
+            elements.forEach((element)=>{
+                let useTag = this.parser._parseElement(element, this.tag.parent)
+
+                if (! useTag) {
+                    return this.parser._skipTag(this.tag, 'empty reference [' + target + ']')
+                }
+
+                // Set matrix from real parent (<use>)
+                useTag.setMatrix(this.tag.matrix)
+
+                // Replace the use tag with new one
+                this.tag.parent.addChild(useTag)
+            })
         }
 
-        // Set matrix from real parent (<use>)
-        useTag.setMatrix(this.tag.matrix)
-
-        // Replace the use tag with new one
-        this.tag.parent.addChild(useTag)
+        useElement(element);
 
         // Skipped tag
         return false
