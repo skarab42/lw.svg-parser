@@ -560,7 +560,8 @@ class TagParser {
             this.parser.symbols[this.tag.element.id] = this.tag.element;
         }
 
-        return true
+        // Skipped tag
+        return false
     }
 
     _use() {
