@@ -557,7 +557,9 @@ class TagParser {
 
     _symbol() {
         if (this.tag.element.id){
-            this.parser.symbols[this.tag.element.id] = this.tag.element;
+            let collection=[];
+            this.tag.element.childNodes.forEach((node)=>{collection.push(node)})
+            this.parser.symbols[this.tag.element.id] = collection;
         }
 
         // Skipped tag
@@ -570,23 +572,32 @@ class TagParser {
 
         // Try to get the defined element
         let element = this.parser.defs[target] || this.parser.symbols[target];
-                
+
         if (! element) {
             return this.parser._skipTag(this.tag, 'undefined reference [' + target + ']')
         }
         
-        // Parse the defined element and set new parent from <use> tag parent
-        let useTag = this.parser._parseElement(element, this.tag.parent)
+        // Parse the defined element and set new parent from <use> tag parent. Supports array of nodes
+        let useElement=(elements) => {
 
-        if (! useTag) {
-            return this.parser._skipTag(this.tag, 'empty reference [' + target + ']')
+            if (!Array.isArray(elements)) { elements = [elements] }
+
+            elements.forEach((element)=>{
+                let useTag = this.parser._parseElement(element, this.tag.parent)
+
+                if (! useTag) {
+                    return this.parser._skipTag(this.tag, 'empty reference [' + target + ']')
+                }
+
+                // Set matrix from real parent (<use>)
+                useTag.setMatrix(this.tag.matrix)
+
+                // Replace the use tag with new one
+                this.tag.parent.addChild(useTag)
+            })
         }
 
-        // Set matrix from real parent (<use>)
-        useTag.setMatrix(this.tag.matrix)
-
-        // Replace the use tag with new one
-        this.tag.parent.addChild(useTag)
+        useElement(element);
 
         // Skipped tag
         return false
